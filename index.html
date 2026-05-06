@@ -281,7 +281,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 <!-- 主界面 -->
 <div class="main-wrap" id="mainWrap">
 
-  <!-- 会员 Banner -->
+  <!-- 会员 Banner - 先隐藏VIP推广
   <div class="member-banner" id="memberBanner" style="display:none">
     <div class="member-banner-left">
       <span class="member-banner-icon">👑</span>
@@ -289,6 +289,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
     </div>
     <button class="member-banner-cta" onclick="showVipModal()">立即开通</button>
   </div>
+  -->
 
   <!-- 今日已挣 -->
   <div class="hero-card">
@@ -407,28 +408,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
     <div class="vip-lock" id="vipLockHint" style="display:none">VIP 语录 · 点击解锁更多</div>
   </div>
 
-  <!-- 皮肤选择 -->
-  <div class="vip-card">
+  <!-- 皮肤选择 - 先隐藏VIP专属皮肤
+  <div class="vip-card" id="skinCard">
     <div class="vip-header">
       <div class="vip-status" id="vipStatus">🌑 普通牛马</div>
-      <button class="vip-btn" onclick="showVipModal()">开通 VIP</button>
+      <button class="vip-btn" onclick="showVipModal()" style="display:none">开通 VIP</button>
     </div>
     <div class="skin-grid">
       <div class="skin-item active" data-theme="default" onclick="switchTheme('default',this)">
         <div class="skin-preview" style="background:linear-gradient(135deg,#FFD700,#FF8C00)"></div>
         <div class="skin-name">默认金</div>
       </div>
-      <div class="skin-item" data-theme="cyber" onclick="switchTheme('cyber',this)">
+      <div class="skin-item vip" data-theme="cyber" onclick="showVipModal()" style="opacity:0.5">
         <div class="skin-preview" style="background:linear-gradient(135deg,#00FFFF,#0044AA)"></div>
         <div class="skin-name">赛博朋克</div>
         <div class="skin-lock">VIP</div>
       </div>
-      <div class="skin-item" data-theme="gold" onclick="switchTheme('gold',this)">
+      <div class="skin-item vip" data-theme="gold" onclick="showVipModal()" style="opacity:0.5">
         <div class="skin-preview" style="background:linear-gradient(135deg,#FFD700,#CC8800)"></div>
         <div class="skin-name">纯金质感</div>
         <div class="skin-lock">VIP</div>
       </div>
-      <div class="skin-item" data-theme="dark" onclick="switchTheme('dark',this)">
+      <div class="skin-item vip" data-theme="dark" onclick="showVipModal()" style="opacity:0.5">
         <div class="skin-preview" style="background:#333;border:1px solid #555"></div>
         <div class="skin-name">低调黑</div>
         <div class="skin-lock">VIP</div>
@@ -447,8 +448,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
     </div>
   </div>
 
-  <!-- 年度账单 -->
-  <div class="report-card">
+  <!-- 年度账单预告 - 先隐藏VIP专属
+  <div class="report-card" id="reportCard">
     <div class="report-icon">📊</div>
     <div class="report-title">2025 出售人生年度报告</div>
     <div class="report-sub">即将发布 · 敬请期待</div>
@@ -457,8 +458,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
       <div class="report-stat"><div class="report-stat-val">2,340h</div><div class="report-stat-label">出售时长</div></div>
       <div class="report-stat"><div class="report-stat-val">642杯</div><div class="report-stat-label">换来奶茶</div></div>
     </div>
-    <button class="report-cta" id="reportBtn" onclick="showVipModal()">🔒 解锁完整报告</button>
+    <button class="report-cta" id="reportBtn" onclick="alert('年度报告即将上线，敬请期待！')">📄 敬请期待</button>
   </div>
+  -->
 
   <!-- 分享 -->
   <button class="share-btn" onclick="shareResult()">
@@ -470,7 +472,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 <!-- 底部 -->
 <div class="bottom-bar" id="bottomBar">
   <div class="bottom-inner">
-    <button class="bottom-btn primary" onclick="showVipModal()">👑 开通 VIP</button>
+    <button class="bottom-btn primary" onclick="alert('VIP功能即将上线！')" style="display:none">👑 开通 VIP</button>
     <button class="bottom-btn secondary" onclick="resetAll()">🔄 重设</button>
   </div>
 </div>
@@ -616,8 +618,16 @@ function updateRank() {
     : Math.min(99.9, Math.max(5, 20 + (hourlyRate/avgHourly)*75));
   document.getElementById('rankPercent').textContent = '跑赢了 ' + winPct.toFixed(1) + '% 的打工人';
   document.getElementById('rankBar').style.width = winPct.toFixed(1) + '%';
-  const texts = ['继续加油，你已经很努力了','比上不足，比下有余','稳稳地站在中间，偏上一点','再努力一点，就能超过一半人了','你已经是前5%了，别卷了'];
-  document.getElementById('rankText').textContent = texts[Math.min(4, Math.floor(winPct/100*5))];
+
+  // 根据排名百分比显示不同文案
+  let rankText;
+  if (winPct < 20) rankText = '继续加油，底层的艰辛我们都懂';
+  else if (winPct < 40) rankText = '比上不足，比下有余';
+  else if (winPct < 60) rankText = '稳稳地站在中间，偏上一点';
+  else if (winPct < 80) rankText = '再加油一点，就超过一半人了';
+  else if (winPct < 95) rankText = '你已经超过80%的打工人';
+  else rankText = '前5%！但老板还是赚得比你多';
+  document.getElementById('rankText').textContent = rankText;
 
   // 更新详细排名（分享解锁后显示）
   if (hasSharedToUnlock) {
