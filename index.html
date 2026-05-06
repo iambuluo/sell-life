@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>出卖人生</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --gold:#FFD700;
+  --gold2:#FFA500;
+  --bg:#0D0D1A;
+  --card:#16162A;
+  --border:#252545;
+  --text:#FFFFFF;
+  --muted:#666;
+  --muted2:#888;
+  --red:#FF6B6B;
+  --green:#4ECDC4;
+  --tag-bg:#1E1E3A;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+.particle{position:fixed;pointer-events:none;font-size:18px;animation:floatUp 1.5s ease-out forwards;z-index:9999}
+@keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-120px) scale(1.5)}}
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.06)}100%{transform:scale(1)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.num-pop{animation:pop 0.15s ease}
+.fade-in{animation:fadeIn 0.5s ease both}
+
+/* 头部 */
+.header{text-align:center;padding:24px 16px 16px;position:relative}
+.header h1{font-size:24px;font-weight:800;background:linear-gradient(135deg,#FFD700,#FF8C00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:3px}
+.header p{font-size:12px;color:var(--muted);margin-top:4px}
+
+/* 设置区 */
+.setup-wrap{padding:0 16px 24px;max-width:480px;margin:0 auto}
+.setup-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:20px;animation:slideUp 0.5s ease both}
+.setup-title{font-size:13px;color:var(--muted2);margin-bottom:16px;letter-spacing:1px}
+.f-row{display:flex;gap:10px;margin-bottom:12px;align-items:center}
+.f-row label{font-size:13px;color:#aaa;width:80px;flex-shrink:0}
+.f-row input,.f-row select{flex:1;background:#1E1E38;border:1px solid #33336A;border-radius:8px;color:#fff;font-size:14px;padding:9px 12px;outline:none;transition:border-color .2s}
+.f-row input:focus,.f-row select:focus{border-color:var(--gold)}
+.f-row select option{background:#1E1E38}
+.f-hint{font-size:11px;color:var(--muted);padding-left:80px;margin-top:-6px;margin-bottom:8px}
+.f-note{font-size:11px;color:var(--muted);margin-bottom:16px;padding-left:80px}
+.btn-start{width:100%;padding:14px;background:linear-gradient(135deg,#FFD700,#FF8C00);border:none;border-radius:12px;color:#111;font-size:15px;font-weight:800;cursor:pointer;letter-spacing:2px;transition:opacity .2s}
+.btn-start:hover{opacity:0.9}
+
+/* 主界面 */
+.main-wrap{padding:0 16px 100px;max-width:480px;margin:0 auto;display:none}
+
+/* 大数字区 */
+.hero-card{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:28px 20px;text-align:center;margin-bottom:12px;position:relative;overflow:hidden}
+.hero-card::before{content:'';position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:300px;height:300px;background:radial-gradient(circle,rgba(255,215,0,0.06) 0%,transparent 70%);pointer-events:none}
+.hero-sub{font-size:11px;color:var(--muted);letter-spacing:2px;margin-bottom:8px;text-transform:uppercase}
+.hero-money{font-size:48px;font-weight:900;color:var(--gold);font-variant-numeric:tabular-nums;line-height:1;transition:transform .1s}
+.hero-unit{font-size:18px;color:var(--gold2);margin-left:4px;vertical-align:middle}
+.hero-rate{font-size:12px;color:var(--muted);margin-top:8px}
+.hero-rate span{color:#aaa}
+
+/* 时薪卡片 */
+.salary-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px}
+.salary-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.salary-label{font-size:12px;color:var(--muted2)}
+.salary-val{font-size:13px;font-weight:600;color:var(--gold)}
+.rank-section{margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.rank-big{font-size:22px;font-weight:800;color:var(--green);text-align:center;margin-bottom:6px}
+.rank-sub{font-size:12px;color:var(--muted);text-align:center}
+.rank-bar-bg{background:#1E1E38;border-radius:8px;height:8px;margin-top:10px;overflow:hidden}
+.rank-bar-fill{height:100%;background:linear-gradient(90deg,#4ECDC4,#FFD700);border-radius:8px;transition:width .5s ease}
+
+/* 老板对比 */
+.boss-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px;position:relative;overflow:hidden}
+.boss-card::before{content:'';position:absolute;right:-20px;top:-20px;width:80px;height:80px;background:radial-gradient(circle,rgba(255,107,107,0.15) 0%,transparent 70%);pointer-events:none}
+.boss-title{font-size:12px;color:var(--muted2);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.boss-title span{font-size:16px}
+.boss-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.boss-item{background:#1A1A30;border-radius:12px;padding:12px;text-align:center}
+.boss-item-label{font-size:11px;color:var(--muted);margin-bottom:4px}
+.boss-item-val{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums}
+.boss-item-val.red{color:var(--red)}
+.boss-item-val.gold{color:var(--gold)}
+.boss-gap{text-align:center;margin-top:10px;font-size:12px;color:var(--muted)}
+.boss-gap strong{color:var(--red);font-size:14px}
+
+/* 实物换算 */
+.stuff-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px}
+.section-title{font-size:12px;color:var(--muted2);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.section-title span{font-size:15px}
+.stuff-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stuff-item{background:#1A1A30;border-radius:12px;padding:14px 10px;text-align:center;transition:transform .2s}
+.stuff-item:hover{transform:scale(1.03)}
+.stuff-icon{font-size:26px;margin-bottom:6px}
+.stuff-val{font-size:18px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums}
+.stuff-label{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* 日历 */
+.cal-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px}
+.cal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cal-item{background:#1A1A30;border-radius:12px;padding:14px;text-align:center}
+.cal-icon{font-size:22px;margin-bottom:6px}
+.cal-val{font-size:18px;font-weight:800;font-variant-numeric:tabular-nums}
+.cal-val.gold{color:var(--gold)}
+.cal-label{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* 语录 */
+.motto-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 16px;margin-bottom:12px;text-align:center;cursor:pointer;min-height:80px;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.motto-card:hover{background:#1A1A30}
+.motto-text{font-size:14px;color:#ccc;line-height:1.8;font-style:italic}
+.motto-text em{color:var(--gold);font-style:normal}
+
+/* 攒钱目标 */
+.goal-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px}
+.goal-input-row{display:flex;gap:8px;margin-bottom:10px}
+.goal-input-row input{flex:1;background:#1E1E38;border:1px solid #33336A;border-radius:8px;color:#fff;font-size:13px;padding:8px 12px;outline:none}
+.goal-input-row input:focus{border-color:var(--gold)}
+.goal-input-row select{background:#1E1E38;border:1px solid #33336A;border-radius:8px;color:#fff;font-size:12px;padding:8px;outline:none}
+.goal-btn{background:var(--gold);border:none;border-radius:8px;color:#111;font-size:12px;font-weight:700;padding:8px 14px;cursor:pointer}
+.goal-progress{margin-top:14px}
+.goal-prog-label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:6px}
+.goal-prog-bar-bg{background:#1E1E38;border-radius:8px;height:8px;overflow:hidden}
+.goal-prog-bar-fill{height:100%;background:linear-gradient(90deg,#FF6B6B,#FFD700);border-radius:8px;transition:width .5s ease}
+.goal-prog-sub{font-size:11px;color:var(--muted);margin-top:6px}
+
+/* 分享 */
+.share-btn{width:100%;padding:14px;background:transparent;border:1px solid var(--border);border-radius:12px;color:var(--muted2);font-size:13px;cursor:pointer;transition:all .2s;margin-bottom:12px}
+.share-btn:hover{border-color:var(--gold);color:var(--gold)}
+.share-btn span{margin-right:6px}
+
+/* 底部 */
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(to top,var(--bg) 70%,transparent);padding:20px 16px 16px;display:none}
+.bottom-btn{width:100%;padding:12px;background:linear-gradient(135deg,#FFD700,#FF8C00);border:none;border-radius:12px;color:#111;font-size:14px;font-weight:700;cursor:pointer}
+
+/* 数据来源 */
+.data-badge{font-size:10px;color:var(--muted);text-align:center;margin-top:8px;opacity:0.6}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>💀 出卖人生</h1>
+  <p>你的命，值多少钱？</p>
+</div>
+
+<!-- 设置 -->
+<div class="setup-wrap" id="setupWrap">
+  <div class="setup-card">
+    <div class="setup-title">✏️ 先告诉系统，你有多能熬</div>
+
+    <div class="f-row">
+      <label>月薪</label>
+      <input type="number" id="monthlySalary" placeholder="税后到手，如：8500" min="0">
+    </div>
+    <div class="f-note">* 填写税后实际到手的工资</div>
+
+    <div class="f-row">
+      <label>每天工时</label>
+      <input type="number" id="workHours" placeholder="8" value="8" min="1" max="24">
+      <span style="color:#888;font-size:13px">小时</span>
+    </div>
+
+    <div class="f-row">
+      <label>每月上班</label>
+      <input type="number" id="workDays" placeholder="22" value="22" min="1" max="31">
+      <span style="color:#888;font-size:13px">天</span>
+    </div>
+
+    <div class="f-row">
+      <label>上班时间</label>
+      <input type="time" id="workStart" value="09:00">
+    </div>
+
+    <div class="f-row">
+      <label>发薪日</label>
+      <input type="number" id="payDay" placeholder="如：15" value="15" min="1" max="31">
+      <span style="color:#888;font-size:13px">号</span>
+    </div>
+
+    <button class="btn-start" onclick="startCounting()">开始出卖 💀</button>
+  </div>
+</div>
+
+<!-- 主界面 -->
+<div class="main-wrap" id="mainWrap">
+
+  <!-- 今日已挣 -->
+  <div class="hero-card">
+    <div class="hero-sub">今日已入账</div>
+    <div class="hero-money" id="todayMoney">0.00<span class="hero-unit">元</span></div>
+    <div class="hero-rate">每秒入账 <span id="perSec">—</span> 元 · 每分钟 <span id="perMin">—</span> 元</div>
+  </div>
+
+  <!-- 时薪 & 排名 -->
+  <div class="salary-card">
+    <div class="salary-row">
+      <div>
+        <div class="salary-label">你的时薪</div>
+        <div class="salary-val" id="hourlyRate">— 元/小时</div>
+      </div>
+      <div style="text-align:right">
+        <div class="salary-label">今日已卖</div>
+        <div class="salary-val" id="hoursSold">— 小时</div>
+      </div>
+    </div>
+    <div class="rank-section">
+      <div class="rank-big" id="rankPercent">—</div>
+      <div class="rank-sub" id="rankText">加载中...</div>
+      <div class="rank-bar-bg">
+        <div class="rank-bar-fill" id="rankBar" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="data-badge">* 基准数据来源：国家统计局2024年城镇就业人员年平均工资</div>
+  </div>
+
+  <!-- 老板对比 -->
+  <div class="boss-card">
+    <div class="boss-title"><span>😠</span> 老板今天挣了多少？</div>
+    <div class="boss-grid">
+      <div class="boss-item">
+        <div class="boss-item-label">老板今日</div>
+        <div class="boss-item-val red" id="bossDay">—</div>
+      </div>
+      <div class="boss-item">
+        <div class="boss-item-label">你今日</div>
+        <div class="boss-item-val gold" id="bossYou">—</div>
+      </div>
+    </div>
+    <div class="boss-gap">差距：老板是你的 <strong id="bossGap">—</strong> 倍</div>
+  </div>
+
+  <!-- 实物换算 -->
+  <div class="stuff-card">
+    <div class="section-title"><span>🛒</span> 今日入账能换什么</div>
+    <div class="stuff-grid">
+      <div class="stuff-item">
+        <div class="stuff-icon">🧋</div>
+        <div class="stuff-val" id="cntTea">0</div>
+        <div class="stuff-label">杯奶茶（¥20）</div>
+      </div>
+      <div class="stuff-item">
+        <div class="stuff-icon">🍜</div>
+        <div class="stuff-val" id="cntNoodle">0</div>
+        <div class="stuff-label">碗拉面（¥15）</div>
+      </div>
+      <div class="stuff-item">
+        <div class="stuff-icon">🍔</div>
+        <div class="stuff-val" id="cntBurger">0</div>
+        <div class="stuff-label">个汉堡（¥25）</div>
+      </div>
+      <div class="stuff-item">
+        <div class="stuff-icon">🎬</div>
+        <div class="stuff-val" id="cntMovie">0</div>
+        <div class="stuff-label">张电影票（¥40）</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 社畜日历 -->
+  <div class="cal-card">
+    <div class="section-title"><span>📅</span> 社畜日历</div>
+    <div class="cal-grid">
+      <div class="cal-item">
+        <div class="cal-icon">💸</div>
+        <div class="cal-val gold" id="payCountdown">—</div>
+        <div class="cal-label">发薪日倒计时</div>
+      </div>
+      <div class="cal-item">
+        <div class="cal-icon">📆</div>
+        <div class="cal-val" id="monthLeft">—</div>
+        <div class="cal-label">本月剩余工作日</div>
+      </div>
+      <div class="cal-item">
+        <div class="cal-icon">⏰</div>
+        <div class="cal-val" id="todayLeft">—</div>
+        <div class="cal-label">今日剩余工时</div>
+      </div>
+      <div class="cal-item">
+        <div class="cal-icon">🏠</div>
+        <div class="cal-val" id="monthEarn">—</div>
+        <div class="cal-label">本月已挣</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 毒鸡汤 -->
+  <div class="motto-card" id="mottoCard" onclick="nextMotto()">
+    <div class="motto-text" id="mottoText">"打工人，打工魂，打工都是人上人。"</div>
+  </div>
+
+  <!-- 攒钱目标 -->
+  <div class="goal-card">
+    <div class="section-title"><span>🎯</span> 攒钱目标</div>
+    <div class="goal-input-row">
+      <input type="number" id="goalAmount" placeholder="目标金额，如：3000">
+      <select id="goalType">
+        <option value="1">买</option>
+        <option value="2">攒</option>
+      </select>
+      <input type="text" id="goalName" placeholder="东西名，如：Switch">
+      <button class="goal-btn" onclick="setGoal()">设</button>
+    </div>
+    <div class="goal-progress" id="goalProgress" style="display:none">
+      <div class="goal-prog-label">
+        <span id="goalTitle">目标进度</span>
+        <span id="goalPct">0%</span>
+      </div>
+      <div class="goal-prog-bar-bg">
+        <div class="goal-prog-bar-fill" id="goalBar" style="width:0%"></div>
+      </div>
+      <div class="goal-prog-sub" id="goalSub">今日贡献：¥0，距离目标还差 ¥0</div>
+    </div>
+  </div>
+
+  <!-- 分享 -->
+  <button class="share-btn" onclick="shareResult()">
+    <span>📤</span> 分享给同事，一起出卖人生
+  </button>
+
+</div>
+
+<!-- 底部重置 -->
+<div class="bottom-bar" id="bottomBar">
+  <button class="bottom-btn" onclick="resetAll()">🔄 重新设置</button>
+</div>
+
+<script>
+// ===== 基础数据 =====
+let state = {
+  salary: 0,
+  hours: 8,
+  days: 22,
+  workStart: '09:00',
+  payDay: 15,
+  goalAmount: 0,
+  goalName: '',
+  goalType: 1
+};
+
+let timer = null;
+let lastInt = 0;
+let mottoIdx = 0;
+let goalSet = false;
+
+// 2024年国家统计局：城镇非私营单位就业人员年平均工资 = 120,698元
+// 即月薪约 10,058元（以此为基准）
+const NATIONAL_AVG_MONTHLY = 10058;
+// 典型小老板年收入假设 = 月薪 × 200（保守估计）
+const BOSS_INCOME_MULTI = 200;
+
+// ===== Mottos =====
+const mottos = [
+  "上班如上坟，<em>但坟里埋的是你的KPI</em>",
+  "你不是在搬砖，<em>你是在给老板的别墅添砖</em>",
+  "今天流的汗，<em>都是明天老板换新车的油</em>",
+  "打工不能致富，<em>但至少能让你饿不死</em>",
+  "每一秒的加班，<em>都在缩短你和老板的距离</em>",
+  "你现在的命，<em>已经比昨天便宜了¥{perSec}</em>",
+  "别抱怨工资低，<em>至少你还有班上</em>",
+  "世界上最远的距离，<em>是你和老板的银行账户</em>",
+  "今天辛苦了，<em>但你的银行卡会记住这一刻</em>",
+  "打工人的命，<em>就是用时间换钱、用钱换命的循环</em>",
+  "你以为你在为公司奋斗，<em>其实你在给房东攒钱</em>",
+  "每一个早起的闹钟，<em>都是你对生活的妥协</em>",
+  "别问工资够不够花，<em>问就是不够</em>",
+  "今天的疲惫，<em>会在发工资那天全部治愈</em>（大概）
+];
+
+// ===== 启动 =====
+function startCounting() {
+  const salary = parseFloat(document.getElementById('monthlySalary').value);
+  const hours = parseFloat(document.getElementById('workHours').value) || 8;
+  const days = parseFloat(document.getElementById('workDays').value) || 22;
+  const workStart = document.getElementById('workStart').value || '09:00';
+  const payDay = parseInt(document.getElementById('payDay').value) || 15;
+
+  if (!salary || salary <= 0) { alert('请输入你的月薪！'); return; }
+
+  state = { salary, hours, days, workStart, payDay, goalAmount: state.goalAmount, goalName: state.goalName, goalType: state.goalType };
+
+  document.getElementById('setupWrap').style.display = 'none';
+  document.getElementById('mainWrap').style.display = 'block';
+  document.getElementById('bottomBar').style.display = 'block';
+
+  updateRank();
+  tick();
+  if (timer) clearInterval(timer);
+  timer = setInterval(tick, 200);
+  updateMotto();
+  setInterval(() => { updateRank(); updateCalendar(); }, 30000);
+}
+
+// ===== 主循环 =====
+function tick() {
+  const now = new Date();
+  const [sh, sm] = state.workStart.split(':').map(Number);
+  const nowMin = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
+  const startMin = sh * 60 + sm;
+
+  let workedMin = nowMin - startMin;
+  if (workedMin < 0) workedMin = 0;
+  if (workedMin > state.hours * 60) workedMin = state.hours * 60;
+
+  const dailySalary = state.salary / state.days;
+  const perSecRate = dailySalary / (state.hours * 3600);
+  const earned = workedMin * 60 * perSecRate;
+
+  // 主数字
+  const moneyEl = document.getElementById('todayMoney');
+  const newInt = Math.floor(earned);
+  if (newInt !== lastInt) {
+    moneyEl.innerHTML = fmtMoney(earned) + '<span class="hero-unit">元</span>';
+    moneyEl.classList.remove('num-pop');
+    void moneyEl.offsetWidth;
+    moneyEl.classList.add('num-pop');
+    if (newInt > lastInt) spawnParticle();
+    lastInt = newInt;
+  } else {
+    moneyEl.innerHTML = fmtMoney(earned) + '<span class="hero-unit">元</span>';
+  }
+
+  // 速率
+  document.getElementById('perSec').textContent = perSecRate.toFixed(4);
+  document.getElementById('perMin').textContent = (perSecRate * 60).toFixed(3);
+
+  // 时薪
+  const hourlyRate = dailySalary / state.hours;
+  document.getElementById('hourlyRate').textContent = hourlyRate.toFixed(2) + ' 元/小时';
+  document.getElementById('hoursSold').textContent = (workedMin / 60).toFixed(1) + ' 小时';
+
+  // 老板
+  const bossDay = (hourlyRate * state.hours * BOSS_INCOME_MULTI).toFixed(0);
+  document.getElementById('bossDay').textContent = '¥' + parseInt(bossDay).toLocaleString();
+  document.getElementById('bossYou').textContent = '¥' + Math.floor(earned).toLocaleString();
+  const gap = bossDay > 0 ? (bossDay / Math.max(earned, 0.01)).toFixed(0) : '—';
+  document.getElementById('bossGap').textContent = gap;
+
+  // 实物
+  document.getElementById('cntTea').textContent = Math.floor(earned / 20);
+  document.getElementById('cntNoodle').textContent = Math.floor(earned / 15);
+  document.getElementById('cntBurger').textContent = Math.floor(earned / 25);
+  document.getElementById('cntMovie').textContent = Math.floor(earned / 40);
+
+  // 目标
+  if (goalSet && state.goalAmount > 0) {
+    const monthEarned = getMonthEarned();
+    const pct = Math.min(100, (monthEarned / state.goalAmount) * 100);
+    document.getElementById('goalPct').textContent = pct.toFixed(1) + '%';
+    document.getElementById('goalBar').style.width = pct.toFixed(1) + '%';
+    document.getElementById('goalSub').textContent =
+      '今日贡献：¥' + Math.floor(earned) + '，距离目标还差 ¥' + Math.max(0, Math.floor(state.goalAmount - monthEarned)).toLocaleString();
+  }
+
+  updateCalendar();
+}
+
+// ===== 排名 =====
+function updateRank() {
+  const hourlyRate = (state.salary / state.days) / state.hours;
+  // 用对数函数模拟分布，高薪人少，大多数人集中在平均线附近
+  // 基准 = NATIONAL_AVG_MONTHLY / 22 / 8 = 57元/小时
+  const avgHourly = NATIONAL_AVG_MONTHLY / 22 / 8;
+  let winPct;
+  if (hourlyRate >= avgHourly * 2) {
+    winPct = 95 + Math.min(4.9, (hourlyRate - avgHourly * 2) / avgHourly * 2);
+  } else {
+    winPct = 20 + (hourlyRate / avgHourly) * 75;
+  }
+  winPct = Math.min(99.9, Math.max(5, winPct));
+  document.getElementById('rankPercent').textContent = '跑赢了 ' + winPct.toFixed(1) + '% 的打工人';
+  document.getElementById('rankBar').style.width = winPct.toFixed(1) + '%';
+  const texts = [
+    '继续加油，你已经很努力了',
+    '比上不足，比下有余',
+    '稳稳地站在中间，偏上一点',
+    '再努力一点，就能超过一半人了',
+    '你已经是前5%了，别卷了'
+  ];
+  const tidx = Math.min(4, Math.floor((winPct / 100) * 5));
+  document.getElementById('rankText').textContent = texts[tidx];
+}
+
+// ===== 日历 =====
+function updateCalendar() {
+  const now = new Date();
+  const day = now.getDate();
+  const payDay = state.payDay;
+
+  // 发薪倒计时
+  let payDiff;
+  if (payDay >= day) {
+    payDiff = payDay - day;
+  } else {
+    payDiff = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate() - day + payDay;
+  }
+  const payStr = payDiff === 0 ? '就是今天！💰' : payDiff + ' 天';
+  document.getElementById('payCountdown').textContent = payStr;
+
+  // 本月剩余
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  const left = daysInMonth - day;
+  document.getElementById('monthLeft').textContent = left + ' 天';
+
+  // 今日剩余
+  const [sh, sm] = state.workStart.split(':').map(Number);
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+  const startMin = sh * 60 + sm;
+  const totalMin = state.hours * 60;
+  const remainMin = Math.max(0, totalMin - (nowMin - startMin));
+  const rh = Math.floor(remainMin / 60);
+  const rm = Math.floor(remainMin % 60);
+  document.getElementById('todayLeft').textContent = rh + 'h' + rm + 'm';
+
+  // 本月已挣
+  document.getElementById('monthEarn').textContent = '¥' + getMonthEarned().toLocaleString();
+}
+
+function getMonthEarned() {
+  const now = new Date();
+  const day = now.getDate();
+  const daily = state.salary / state.days;
+  return daily * Math.min(day, state.days);
+}
+
+// ===== 语录 =====
+function updateMotto() {
+  const el = document.getElementById('mottoText');
+  const perSecRate = (state.salary / state.days) / (state.hours * 3600);
+  let text = mottos[mottoIdx % mottos.length];
+  if (text.includes('{perSec}')) {
+    text = text.replace('{perSec}', perSecRate.toFixed(4));
+  }
+  el.style.opacity = 0;
+  setTimeout(() => {
+    el.innerHTML = '"' + text + '"';
+    el.style.opacity = 1;
+    el.style.transition = 'opacity 0.5s';
+  }, 300);
+  mottoIdx++;
+}
+function nextMotto() { updateMotto(); }
+setInterval(updateMotto, 15000);
+
+// ===== 目标 =====
+function setGoal() {
+  const amt = parseFloat(document.getElementById('goalAmount').value);
+  const name = document.getElementById('goalName').value;
+  const type = parseInt(document.getElementById('goalType').value);
+  if (!amt || amt <= 0) { alert('请输入目标金额！'); return; }
+  state.goalAmount = amt;
+  state.goalName = name || '目标';
+  state.goalType = type;
+  goalSet = true;
+  document.getElementById('goalProgress').style.display = 'block';
+  document.getElementById('goalTitle').textContent = (type === 1 ? '买' : '攒') + (name || '目标') + ' 进度';
+  tick();
+}
+
+// ===== 分享 =====
+function shareResult() {
+  const earned = document.getElementById('todayMoney').textContent;
+  const hourly = document.getElementById('hourlyRate').textContent;
+  const text = '我在「卖命计数器」算了一下，今天已经入账' + earned + '！\n我的时薪是' + hourly + '\n你的命值多少钱？💀\n\n→ 出卖人生';
+  if (navigator.share) {
+    navigator.share({ title: '出卖人生', text: text });
+  } else {
+    navigator.clipboard.writeText(text).then(() => alert('已复制到剪贴板！'));
+  }
+}
+
+// ===== 粒子 =====
+const emojis = ['💀','💰','✨','🤑','💵','🌟','💫','⚰️'];
+function spawnParticle() {
+  if (Math.random() > 0.35) return;
+  const el = document.createElement('div');
+  el.className = 'particle';
+  el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+  el.style.left = (15 + Math.random() * 70) + 'vw';
+  el.style.top = (20 + Math.random() * 40) + 'vh';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1500);
+}
+
+// ===== 工具 =====
+function fmtMoney(num) {
+  if (num < 1000) return num.toFixed(2);
+  if (num < 100000) return Math.floor(num).toLocaleString('zh-CN');
+  return Math.floor(num).toLocaleString('zh-CN');
+}
+
+function resetAll() {
+  if (timer) clearInterval(timer);
+  timer = null;
+  lastInt = 0;
+  goalSet = false;
+  document.getElementById('setupWrap').style.display = 'block';
+  document.getElementById('mainWrap').style.display = 'none';
+  document.getElementById('bottomBar').style.display = 'none';
+  document.getElementById('goalProgress').style.display = 'none';
+}
+</script>
+</body>
+</html>
