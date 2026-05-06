@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>打工人希望计算器</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: #0f0f1a;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 24px 16px;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #ffd700;
+    letter-spacing: 2px;
+  }
+  .header p {
+    font-size: 13px;
+    color: #888;
+    margin-top: 6px;
+  }
+
+  .setup-card {
+    background: #1a1a2e;
+    border: 1px solid #2a2a4a;
+    border-radius: 16px;
+    padding: 20px;
+    width: 100%;
+    max-width: 420px;
+    margin-bottom: 20px;
+  }
+
+  .setup-card h2 {
+    font-size: 14px;
+    color: #aaa;
+    margin-bottom: 14px;
+    font-weight: 400;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+    align-items: center;
+  }
+
+  .input-row label {
+    font-size: 13px;
+    color: #ccc;
+    width: 70px;
+    flex-shrink: 0;
+  }
+
+  .input-row input, .input-row select {
+    flex: 1;
+    background: #252540;
+    border: 1px solid #3a3a5a;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    padding: 8px 12px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .input-row input:focus, .input-row select:focus {
+    border-color: #ffd700;
+  }
+  .input-row select option { background: #252540; }
+
+  .btn-start {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #ffd700, #ffaa00);
+    border: none;
+    border-radius: 10px;
+    color: #111;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 6px;
+    transition: opacity 0.2s;
+  }
+  .btn-start:hover { opacity: 0.9; }
+
+  /* 主展示区 */
+  .counter-area {
+    width: 100%;
+    max-width: 420px;
+    display: none;
+  }
+
+  .big-card {
+    background: #1a1a2e;
+    border: 1px solid #2a2a4a;
+    border-radius: 20px;
+    padding: 28px 20px;
+    text-align: center;
+    margin-bottom: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .big-card::before {
+    content: '';
+    position: absolute;
+    top: -60px; left: 50%;
+    transform: translateX(-50%);
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(255,215,0,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .earned-label {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 6px;
+    letter-spacing: 1px;
+  }
+
+  .earned-amount {
+    font-size: 52px;
+    font-weight: 800;
+    color: #ffd700;
+    letter-spacing: -1px;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
+    transition: transform 0.1s;
+  }
+
+  .earned-unit {
+    font-size: 18px;
+    color: #ffaa00;
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+
+  .rate-text {
+    font-size: 12px;
+    color: #666;
+    margin-top: 10px;
+  }
+
+  .rate-text span {
+    color: #aaa;
+  }
+
+  /* 趣味数据卡片 */
+  .mini-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .mini-card {
+    background: #1a1a2e;
+    border: 1px solid #2a2a4a;
+    border-radius: 14px;
+    padding: 14px 12px;
+    text-align: center;
+  }
+
+  .mini-card .icon {
+    font-size: 22px;
+    margin-bottom: 6px;
+  }
+
+  .mini-card .val {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .mini-card .desc {
+    font-size: 11px;
+    color: #666;
+    margin-top: 3px;
+  }
+
+  /* 鼓励语 */
+  .motto-card {
+    background: #1a1a2e;
+    border: 1px solid #2a2a4a;
+    border-radius: 14px;
+    padding: 16px;
+    text-align: center;
+    margin-bottom: 14px;
+  }
+
+  .motto-text {
+    font-size: 14px;
+    color: #ccc;
+    line-height: 1.7;
+  }
+  .motto-text em {
+    color: #ffd700;
+    font-style: normal;
+    font-weight: 600;
+  }
+
+  /* 进度条 */
+  .progress-card {
+    background: #1a1a2e;
+    border: 1px solid #2a2a4a;
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 8px;
+  }
+
+  .progress-bar-bg {
+    background: #252540;
+    border-radius: 10px;
+    height: 8px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ffd700, #ff6b35);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+    width: 0%;
+  }
+
+  .btn-reset {
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    border: 1px solid #3a3a5a;
+    border-radius: 10px;
+    color: #666;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-reset:hover { border-color: #888; color: #aaa; }
+
+  /* 粒子 */
+  .particle {
+    position: fixed;
+    pointer-events: none;
+    font-size: 18px;
+    animation: floatUp 1.5s ease-out forwards;
+    z-index: 999;
+  }
+  @keyframes floatUp {
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-120px) scale(1.5); }
+  }
+
+  /* 数字跳动 */
+  @keyframes numPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+  }
+  .num-pop { animation: numPop 0.15s ease; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>💰 打工人希望计算器</h1>
+  <p>看着钱在长，感受活着的意义</p>
+</div>
+
+<!-- 设置区 -->
+<div class="setup-card" id="setupCard">
+  <h2>✏️ 填写你的工资信息</h2>
+  <div class="input-row">
+    <label>月工资</label>
+    <input type="number" id="monthlySalary" placeholder="如：8000" min="0">
+  </div>
+  <div class="input-row">
+    <label>每天工作</label>
+    <input type="number" id="workHours" placeholder="8" value="8" min="1" max="24">
+    <span style="color:#888;font-size:13px;white-space:nowrap">小时</span>
+  </div>
+  <div class="input-row">
+    <label>每月上班</label>
+    <input type="number" id="workDays" placeholder="22" value="22" min="1" max="31">
+    <span style="color:#888;font-size:13px;white-space:nowrap">天</span>
+  </div>
+  <div class="input-row">
+    <label>上班时间</label>
+    <input type="time" id="workStart" value="09:00">
+    <span style="color:#888;font-size:13px;white-space:nowrap">开始</span>
+  </div>
+  <button class="btn-start" onclick="startCounting()">开始数钱 💸</button>
+</div>
+
+<!-- 计数展示区 -->
+<div class="counter-area" id="counterArea">
+
+  <div class="big-card">
+    <div class="earned-label">今天已到手</div>
+    <div class="earned-amount" id="todayEarned">0.00<span class="earned-unit">元</span></div>
+    <div class="rate-text">每秒进账 <span id="perSecond">—</span> 元 · 每分钟 <span id="perMinute">—</span> 元</div>
+  </div>
+
+  <div class="progress-card">
+    <div class="progress-label">
+      <span>今日进度</span>
+      <span id="progressPct">0%</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+  </div>
+
+  <div class="mini-cards">
+    <div class="mini-card">
+      <div class="icon">☕</div>
+      <div class="val" id="coffeeCount">0</div>
+      <div class="desc">杯奶茶（￥20）</div>
+    </div>
+    <div class="mini-card">
+      <div class="icon">🍜</div>
+      <div class="val" id="noodleCount">0</div>
+      <div class="desc">碗兰州拉面（￥15）</div>
+    </div>
+    <div class="mini-card">
+      <div class="icon">🎬</div>
+      <div class="val" id="movieCount">0</div>
+      <div class="desc">张电影票（￥40）</div>
+    </div>
+    <div class="mini-card">
+      <div class="icon">💊</div>
+      <div class="val" id="hoursSold">0</div>
+      <div class="desc">小时生命换来的</div>
+    </div>
+  </div>
+
+  <div class="motto-card">
+    <div class="motto-text" id="mottoText">加载中...</div>
+  </div>
+
+  <button class="btn-reset" onclick="resetAll()">重新设置</button>
+</div>
+
+<script>
+let timer = null;
+let perSecondRate = 0;
+let workStartMinutes = 0;
+let workTotalMinutes = 0;
+let lastAmount = 0;
+let mottoIndex = 0;
+
+const mottos = [
+  '时间一秒一秒地流逝，<em>钱也在一分一分地进账。</em>',
+  '你每一次深呼吸，<em>都有钱打进来。</em>',
+  '老板在压榨你，但<em>时薪表从不骗人。</em>',
+  '打工是不可能不打工的，但<em>每秒都在实现财富自由。</em>',
+  '你现在盯着屏幕的这一秒，<em>刚刚值了' + '0' + '元。</em>',
+  '今天辛苦了，<em>但钱记得你的每一秒。</em>',
+  '心在滴血，<em>但账户在增加。</em>',
+  '上班如上坟，<em>但坟里全是钱。</em>',
+  '生活不只眼前的苦，<em>还有数不清的工资。</em>',
+  '熬过今天，<em>你的银行卡会感谢你的。</em>',
+];
+
+function startCounting() {
+  const salary = parseFloat(document.getElementById('monthlySalary').value);
+  const workHours = parseFloat(document.getElementById('workHours').value) || 8;
+  const workDays = parseFloat(document.getElementById('workDays').value) || 22;
+  const workStartVal = document.getElementById('workStart').value || '09:00';
+
+  if (!salary || salary <= 0) {
+    alert('请输入你的月工资！');
+    return;
+  }
+
+  const dailySalary = salary / workDays;
+  perSecondRate = dailySalary / (workHours * 3600);
+
+  document.getElementById('perSecond').textContent = perSecondRate.toFixed(4);
+  document.getElementById('perMinute').textContent = (perSecondRate * 60).toFixed(3);
+
+  const [sh, sm] = workStartVal.split(':').map(Number);
+  workStartMinutes = sh * 60 + sm;
+  workTotalMinutes = workHours * 60;
+
+  document.getElementById('setupCard').style.display = 'none';
+  document.getElementById('counterArea').style.display = 'block';
+
+  updateMotto();
+  tick();
+  if (timer) clearInterval(timer);
+  timer = setInterval(tick, 200);
+  setInterval(updateMotto, 15000);
+}
+
+function tick() {
+  const now = new Date();
+  const nowMinutes = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
+
+  let workedMinutes = nowMinutes - workStartMinutes;
+  if (workedMinutes < 0) workedMinutes = 0;
+  if (workedMinutes > workTotalMinutes) workedMinutes = workTotalMinutes;
+
+  const workedSeconds = workedMinutes * 60;
+  const earned = workedSeconds * perSecondRate;
+
+  // 更新主数字
+  const earnedEl = document.getElementById('todayEarned');
+  const newText = formatMoney(earned) + '<span class="earned-unit">元</span>';
+  if (Math.floor(earned * 10) !== Math.floor(lastAmount * 10)) {
+    earnedEl.innerHTML = newText;
+    earnedEl.classList.remove('num-pop');
+    void earnedEl.offsetWidth;
+    earnedEl.classList.add('num-pop');
+    if (Math.floor(earned) > Math.floor(lastAmount)) {
+      spawnParticle();
+    }
+  } else {
+    earnedEl.innerHTML = newText;
+  }
+  lastAmount = earned;
+
+  // 进度条
+  const pct = Math.min(100, (workedMinutes / workTotalMinutes) * 100);
+  document.getElementById('progressBar').style.width = pct.toFixed(1) + '%';
+  document.getElementById('progressPct').textContent = pct.toFixed(1) + '%';
+
+  // 趣味换算
+  document.getElementById('coffeeCount').textContent = Math.floor(earned / 20);
+  document.getElementById('noodleCount').textContent = Math.floor(earned / 15);
+  document.getElementById('movieCount').textContent = Math.floor(earned / 40);
+  document.getElementById('hoursSold').textContent = (workedMinutes / 60).toFixed(1);
+}
+
+function formatMoney(num) {
+  if (num < 1000) return num.toFixed(2);
+  return num.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function updateMotto() {
+  const el = document.getElementById('mottoText');
+  const idx = mottoIndex % mottos.length;
+  let text = mottos[idx];
+  if (idx === 4) {
+    text = text.replace('0', (perSecondRate).toFixed(4));
+  }
+  el.style.opacity = 0;
+  setTimeout(() => {
+    el.innerHTML = text;
+    el.style.opacity = 1;
+    el.style.transition = 'opacity 0.6s';
+  }, 300);
+  mottoIndex++;
+}
+
+const emojis = ['💰','✨','🤑','💵','🌟','💫'];
+function spawnParticle() {
+  if (Math.random() > 0.3) return;
+  const el = document.createElement('div');
+  el.className = 'particle';
+  el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+  el.style.left = (20 + Math.random() * 60) + 'vw';
+  el.style.top = (30 + Math.random() * 30) + 'vh';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1500);
+}
+
+function resetAll() {
+  if (timer) clearInterval(timer);
+  timer = null;
+  lastAmount = 0;
+  document.getElementById('setupCard').style.display = 'block';
+  document.getElementById('counterArea').style.display = 'none';
+}
+</script>
+</body>
+</html>
